@@ -1,5 +1,7 @@
 package edu.ncsu.csc.itrust2.controllers.admin;
 
+import redis.clients.jedis.*;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +27,7 @@ public class AdminController {
     @RequestMapping ( value = "admin/index" )
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public String index ( final Model model ) {
+
         return edu.ncsu.csc.itrust2.models.enums.Role.ROLE_ADMIN.getLanding();
     }
     
@@ -75,7 +78,13 @@ public class AdminController {
     @RequestMapping ( value = "admin/hospitals" )
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     public String manageHospital ( final Model model ) {
+	JedisPool pool = null;
+	pool = new JedisPool("localhost", 6379);
+	Jedis jedis = pool.getResource();
+	String b=jedis.get("hospitals");
+	if(b.equals("true"))
         return "/admin/hospitals";
+	return "/admin/index";
     }
     
     /**
